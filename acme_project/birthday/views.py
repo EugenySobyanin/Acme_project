@@ -1,5 +1,5 @@
 from django.core.paginator import Paginator
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 
@@ -41,14 +41,14 @@ def birthday(request, pk=None):
 #     return render(request, 'birthday/birthday_list.html', context)
 
 
-def birthday_delete(request, pk):
-    instance = get_object_or_404(Birthday, pk=pk)
-    form = BirthdayForm(instance=instance)
-    context = {'form': form}
-    if request.method == 'POST':
-        instance.delete()
-        return redirect('birthday:list')
-    return render(request, 'birthday/birthday.html', context)
+# def birthday_delete(request, pk):
+#     instance = get_object_or_404(Birthday, pk=pk)
+#     form = BirthdayForm(instance=instance)
+#     context = {'form': form}
+#     if request.method == 'POST':
+#         instance.delete()
+#         return redirect('birthday:list')
+#     return render(request, 'birthday/birthday.html', context)
 
 
 class BirthdayListView(ListView):
@@ -57,9 +57,23 @@ class BirthdayListView(ListView):
     paginate_by = 5
 
 
-class BirthdayCreateView(CreateView):
+class BirthdayMixin:
     model = Birthday
-    # fields = '__all__'
+    success_url = reverse_lazy('birthday:list')
+
+
+class BirthdayFormMixin:
     form_class = BirthdayForm
     template_name = 'birthday/birthday.html'
-    success_url = reverse_lazy('birthday:list')
+
+
+class BirthdayCreateView(BirthdayMixin, BirthdayFormMixin, CreateView):
+    pass
+
+
+class BirthdayUpdateView(BirthdayMixin, BirthdayFormMixin, UpdateView):
+    pass
+
+
+class BirthdayDeleteView(BirthdayMixin, DeleteView):
+    pass
